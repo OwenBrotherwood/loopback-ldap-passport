@@ -16,13 +16,42 @@ app.start = function() {
 // Sub-apps like REST API are mounted via boot scripts.
 boot(app, __dirname, function(err) {
   if (err) throw err;
-
+  
 //
 // I would prefer that this code was somewhere else (../boot/passport.js ?)
 // I think it could be important that the code is "after" boot, or at a specific point in boot.
 // "work in progress" I follow the yellow brick road from googling...
 //
-// attempt to build the providers/passport config
+var flash      = require('express-flash');
+var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
+
+// Setup the view engine (jade)
+var path = require('path');
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
+
+app.get('/', function (req, res, next) {
+  res.render('pages/index', {user:
+    req.user,
+    url: req.url
+  });
+});
+
+app.get('/login', function (req, res, next){
+  res.render('pages/login', {
+    user: req.user,
+    url: req.url
+   });
+});
+
+// Requests that get this far won't be handled
+// by any middleware. Convert them into a 404 error
+// that will be handled later down the chain.
+app.use(loopback.urlNotFound());
+
+// The ultimate error handler.
+app.use(loopback.errorHandler());
+
 var providerPassportConfig = {};
 try {
 	providerPassportConfig = require('../providers.json');

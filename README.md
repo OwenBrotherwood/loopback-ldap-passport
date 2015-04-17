@@ -14,4 +14,4 @@ Access to an app that "just" requires an authentication, authorization is given.
 Access to an app that requires being a member of a (LDAP/AD) group.
 
 An interesting sub-case is that a typical loopback app has some form of user database. 
-In an (LDAP/AD) case, it would be desirable that the user is automatically created if  authorization allows for this: otherwise 
+In an (LDAP/AD) case, it would be desirable that the user is automatically created if  authorization allows for this, otherwise too much administration in registering/creating a user.
