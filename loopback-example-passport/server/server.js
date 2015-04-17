@@ -1,27 +1,7 @@
 var loopback = require('loopback');
 var boot = require('loopback-boot');
-
 var app = module.exports = loopback();
 
-
-app.start = function() {
-  // start the web server
-  return app.listen(function() {
-    app.emit('started');
-    console.log('Web server listening at: %s', app.get('url'));
-  });
-};
-
-// Bootstrap the application, configure models, datasources and middleware.
-// Sub-apps like REST API are mounted via boot scripts.
-boot(app, __dirname, function(err) {
-  if (err) throw err;
-  
-//
-// I would prefer that this code was somewhere else (../boot/passport.js ?)
-// I think it could be important that the code is "after" boot, or at a specific point in boot.
-// "work in progress" I follow the yellow brick road from googling...
-//
 // Passport configurators..
 var loopbackPassport = require('loopback-component-passport');
 var PassportConfigurator = loopbackPassport.PassportConfigurator;
@@ -93,15 +73,11 @@ passportConfigurator.init();
 // We need flash messages to see passport errors
 app.use(flash());
 
-//console.log("NO setupModels at the moment");
-
 passportConfigurator.setupModels({
 	userModel: app.models.user,
 	userIdentityModel: app.models.userIdentity,
 	userCredentialModel: app.models.userCredential
 });
-
-
 for (var s in config) {
 	var c = config[s];
 	c.session = c.session !== false;
@@ -207,7 +183,15 @@ app.use(loopback.urlNotFound());
 // The ultimate error handler.
 app.use(loopback.errorHandler());
 
-  // start the server if `$ node server.js`
-  if (require.main === module)
-    app.start();
-});
+app.start = function() {
+	// start the web server
+	return app.listen(function() {
+		app.emit('started');
+		console.log('Web server listening at: %s', app.get('url'));
+	});
+};
+
+// start the server if `$ node server.js`
+if (require.main === module) {
+	app.start();
+}
